@@ -9,27 +9,26 @@ for _ in 0..<n {
 var result = Int.max
 var visited = [Int]()
 
-func dfs(_ depth: Int) {
+// depth: 방문지 개수, sum: 여행 비용, now: 현재 위치
+func dfs(_ depth: Int, _ sum: Int) {
+    // 현재까지 비용이 result 이상이면 더 탐색할 필요 X
+    if sum >= result { return }
+    
     if depth == n {
-        var temp = 0
-        for k in 0..<n-1 {
-            temp += cost[visited[k]][visited[k+1]]
-        }
-        // 출발지로 돌아오는 비용 더하기
-        let goBackCost = cost[visited.last!][visited.first!]
-        if goBackCost != 0 {
-            temp += goBackCost
-            result = min(result, temp)
-            return
-        } else {
-            return
-        }
+        let last = visited.last!
+        let first = visited.first!
+        // 출발지로 돌아갈 수 있는 경우라면 돌아가는 비용까지 계산 후 결과에 반영
+        if cost[last][first] == 0 { return }
+        result = min(result, sum+cost[last][first])
+        return
     }
     
     for i in 0..<n {
-        if !visited.contains(i) && cost[visited.last!][i] != 0 {
+        // 방문하지 않았고 현재 위치에서 갈 수 있는 곳이라면
+        let last = visited.last!
+        if !visited.contains(i) && cost[last][i] != 0 {
             visited.append(i)
-            dfs(depth+1)
+            dfs(depth+1, sum+cost[last][i])
             visited.popLast()
         }
     }
@@ -37,7 +36,7 @@ func dfs(_ depth: Int) {
 
 for i in 0..<n {
     visited.append(i)
-    dfs(1)
+    dfs(1, 0)
     visited.popLast()
 }
 
