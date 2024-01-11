@@ -4,7 +4,7 @@ let n = Int(readLine()!)!
 
 var arr = [Int]()
 func dfs(_ depth: Int) {
-    if arr.count == n {
+    if depth == n {
         print(arr.map{String($0)}.joined(separator: " "))
         return
     }
