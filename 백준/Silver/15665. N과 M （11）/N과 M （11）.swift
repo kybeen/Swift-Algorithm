@@ -6,26 +6,22 @@ let M = nums[1]
 var arr = readLine()!.split(separator: " ").map { Int($0)! }
 arr.sort()
 
-var stack = [String]()
 var result = ""
-var set = Set<String>()
 
-func dfs(_ depth: Int) {
+func dfs(_ depth: Int, _ nowArr: String) {
     if depth == M {
-        let temp = stack.joined(separator: " ")
-        if !set.contains(temp) {
-            set.insert(temp)
-            result += temp + "\n"
-        }
+        result += nowArr + "\n"
         return
     }
     
+    var recent = 0 // 현재 depth에서 마지막으로 확인한 숫자 (한 depth에서는 같은 수를 확인하면 중복이기 때문에 확인할 필요 x)
     for i in 0..<N {
-        stack.append(String(arr[i]))
-        dfs(depth+1)
-        _ = stack.popLast()
+        if recent != arr[i] {
+            recent = arr[i]
+            dfs(depth+1, nowArr + "\(arr[i]) ")
+        }
     }
 }
 
-dfs(0)
+dfs(0, "")
 print(result)
