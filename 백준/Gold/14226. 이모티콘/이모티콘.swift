@@ -17,24 +17,20 @@ while idx < queue.count {
         exit(0)
     }
     
-    if 1...2000 ~= now.0 {
-        // 1. 화면에 있는 이모티콘을 모두 복사해서 클립보드에 저장한다.
-        if !visited[now.0][now.0] {
-            queue.append((now.0, now.0, now.2+1))
-            visited[now.0][now.0] = true
-        }
-        // 3. 화면에 있는 이모티콘 중 하나를 삭제한다.
-        if !visited[now.0-1][now.1] {
-            queue.append((now.0-1, now.1, now.2+1))
-            visited[now.0-1][now.1] = true
-        }
+    // 1. 화면에 있는 이모티콘을 모두 복사해서 클립보드에 저장한다.
+    if (now.0 != now.1) && (0...2000 ~= now.0) && !visited[now.0][now.0] {
+        queue.append((now.0, now.0, now.2+1))
+        visited[now.0][now.0] = true
     }
-    if now.1 > 0 && now.0+now.1 <= 2000 {
-        // 2. 클립보드에 있는 모든 이모티콘을 화면에 붙여넣기 한다.
-        if !visited[now.0+now.1][now.1] {
-            queue.append((now.0+now.1, now.1, now.2+1))
-            visited[now.0+now.1][now.1] = true
-        }
+    // 2. 클립보드에 있는 모든 이모티콘을 화면에 붙여넣기 한다.
+    if (now.1 > 0) && (0...2000 ~= now.0+now.1) && !visited[now.0+now.1][now.1] {
+        queue.append((now.0+now.1, now.1, now.2+1))
+        visited[now.0+now.1][now.1] = true
+    }
+    // 3. 화면에 있는 이모티콘 중 하나를 삭제한다.
+    if (now.0 > 0) && !visited[now.0-1][now.1] {
+        queue.append((now.0-1, now.1, now.2+1))
+        visited[now.0-1][now.1] = true
     }
     
     idx += 1
