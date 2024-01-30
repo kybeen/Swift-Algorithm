@@ -13,13 +13,11 @@ for _ in 0..<N {
 var isCycle = [Bool](repeating: false, count: N+1) // 순환선인지에 대한 정보를 저장할 배열
 var visited = [Bool](repeating: false, count: N+1) // 역 탐색 시 방문 횟수 체크
 var line = [Int]() // 방문 역을 저장하는 스택
-var result = [Int](repeating: 0, count: N+1) // 각 역과 순환선 사이의 거리
 
 // 순환선 여부를 구하기 위한 DFS 함수
 func dfs(_ depth: Int, _ start: Int, _ now: Int) {
-    // 한 바퀴 돌았다면 순환선임
-    if depth >= 3,
-       stations[now].contains(start) {
+    // 한 바퀴 돌았다면 순환선임 (depth가 3 이상이어야 순환선이 될 수 있다.)
+    if depth >= 3 && start == now {
         for l in line {
             isCycle[l] = true
         }
@@ -27,6 +25,7 @@ func dfs(_ depth: Int, _ start: Int, _ now: Int) {
     }
     
     for station in stations[now] {
+        // 이미 순환선이 확인된 역이면 탐색하지 않는다.
         guard !isCycle[station] else { continue }
         
         if !visited[station] {
@@ -35,6 +34,10 @@ func dfs(_ depth: Int, _ start: Int, _ now: Int) {
             dfs(depth+1, start, station)
             _ = line.popLast()
             visited[station] = false
+        } else {
+            if depth >= 3 && station == start {
+                dfs(depth, start, station)
+            }
         }
     }
 }
@@ -48,6 +51,8 @@ for i in 1...N {
     _ = line.popLast()
     visited[i] = false
 }
+
+var result = [Int](repeating: 0, count: N+1) // 각 역과 순환선 사이의 거리
 
 // 각 역과 순환선 사이의 거리를 구하기 위한 BFS 함수
 func bfs(_ start: Int) {
