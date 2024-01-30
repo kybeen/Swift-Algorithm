@@ -7,44 +7,21 @@ for _ in 0..<N {
     tree[nodes[0]] = [nodes[1], nodes[2]]
 }
 
-// 전위 순회
-func dfs1(_ now: String) {
-    print(now, terminator: "")
-    
-    for child in tree[now]! {
-        if child != "." {
-            dfs1(child)
-        }
-    }
-}
-
-// 중위 순회
-func dfs2(_ now: String) {
+var result: [String] = ["", "", ""]
+func dfs(_ now: String) {
     let left = tree[now]![0]
     let right = tree[now]![1]
     
+    result[0] += now // 전위순회
     if left != "." {
-        dfs2(left)
+        dfs(left)
     }
-    print(now, terminator: "")
+    result[1] += now // 중위순회
     if right != "." {
-        dfs2(right)
+        dfs(right)
     }
+    result[2] += now // 후위순회
 }
 
-// 후위 순회
-func dfs3(_ now: String) {
-    for child in tree[now]! {
-        if child != "." {
-            dfs3(child)
-        }
-    }
-    
-    print(now, terminator: "")
-}
-
-dfs1("A")
-print()
-dfs2("A")
-print()
-dfs3("A")
+dfs("A")
+print(result.joined(separator: "\n"))
