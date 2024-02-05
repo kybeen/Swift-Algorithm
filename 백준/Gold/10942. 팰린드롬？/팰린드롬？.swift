@@ -69,6 +69,7 @@ for i in 1...N {
     }
 }
 
+// dp[i][i]에서 출발해서 위로 확산하면서 뻗어나가며 팰린드롬을 확인한다.
 for i in stride(from: N-1, through: 2, by: -1) {
     var holOffset = 1
     var zzakOffset = 2
@@ -78,6 +79,7 @@ for i in stride(from: N-1, through: 2, by: -1) {
         if nums[i-holOffset] == nums[i+holOffset] {
             dp[i-holOffset][i+holOffset] = 1
         } else {
+            // 팰린드롬이 아닌 곳이 나오면 더 확인할 필요가 없음 (더 뻗어도 더 이상 팰린드롬이 아니기 때문에)
             break
         }
         
@@ -90,6 +92,7 @@ for i in stride(from: N-1, through: 2, by: -1) {
             if nums[i-zzakOffset+1] == nums[i+zzakOffset] {
                 dp[i-zzakOffset+1][i+zzakOffset] = 1
             } else {
+                // 팰린드롬이 아닌 곳이 나오면 더 확인할 필요가 없음 (더 뻗어도 더 이상 팰린드롬이 아니기 때문에)
                 break
             }
             
