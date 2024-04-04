@@ -1,13 +1,12 @@
 import Foundation
 
-let word = Array(readLine()!)
+let S = Array(readLine()!)
 var result = [Int](repeating: -1, count: 26)
 
-for i in 0..<word.count {
-    let alphabet = String(word[i])
-    let index = Int(UnicodeScalar(alphabet)!.value) - 97
-    if result[index] == -1 {
-        result[index] = i
+for i in 0..<S.count {
+    var idx = Int(UnicodeScalar(String(S[i]))!.value) - 97
+    if result[idx] == -1 {
+        result[idx] = i
     }
 }
 print(result.map { String($0) }.joined(separator: " "))
