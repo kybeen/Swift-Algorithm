@@ -3,30 +3,33 @@ import Foundation
 let NM = readLine()!.split(separator: " ").map { Int($0)! }
 let N = NM[0]
 let M = NM[1]
-let trees = readLine()!.split(separator: " ").map { Int($0)! }
+var trees = readLine()!.split(separator: " ").map { Int($0)! }
 
-var start = 1
-var end = trees.max()!
-var result = 0
-
-while start <= end {
-    let mid = (start + end) / 2 // 절단기의 높이
-    
-    var totalLen = 0
+// 나무 자르기
+func cutTrees(height: Int) -> Int {
+    var result = 0
     for tree in trees {
-        // 나무의 높이가 절단기 높이보다 높으면 잘린 길이 더하기
-        if tree > mid {
-            totalLen += (tree - mid)
+        if (tree - height) > 0 {
+            result += (tree - height)
+        }
+    }
+    return result
+}
+
+func binarySearch() -> Int {
+    var start = 0
+    var end = trees.max()! + 1
+    
+    while start + 1 < end {
+        let mid = (start + end) / 2
+        if cutTrees(height: mid) >= M {
+            start = mid
+        } else {
+            end = mid
         }
     }
     
-    // M미터 이상의 나무를 자를 수 있으면
-    if totalLen >= M {
-        result = max(result, mid)
-        start = mid + 1
-    } else { // M미터 이상의 나무를 자를 수 없으면
-        end = mid - 1
-    }
+    return start
 }
 
-print(result)
+print(binarySearch())
