@@ -3,40 +3,34 @@ import Foundation
 let KN = readLine()!.split(separator: " ").map { Int($0)! }
 let K = KN[0]
 let N = KN[1]
-var lines = [Int]()
+var lans = [Int]()
 for _ in 0..<K {
-    lines.append(Int(readLine()!)!)
+    lans.append(Int(readLine()!)!)
 }
 
-// N개 이상으로 쪼갤 수 있는지 확인
-func isDividable(length: Int) -> Bool {
-    var count = 0
-    for line in lines {
-        count += (line / length)
+// 만들 수 있는 랜선 개수 구하기
+func makeLans(length: Int) -> Int {
+    var result = 0
+    for lan in lans {
+        result += (lan / length)
+    }
+    return result
+}
+
+func binarySearch() {
+    var start = 0
+    var end = lans.max()! + 1
+    
+    while start + 1 < end {
+        let mid = (start + end) / 2
+        if makeLans(length: mid) >= N {
+            start = mid
+        } else {
+            end = mid
+        }
     }
     
-    if count >= N {
-        return true
-    } else {
-        return false
-    }
+    print(start)
 }
 
-var start = 1
-var end = lines.max()! // 가장 긴 랜선의 길이
-var result = 0
-
-// 이분 탐색
-while start <= end {
-    let mid = (start + end) / 2
-    
-    // mid 길이로 N개 이상 쪼개진다면
-    if isDividable(length: mid) {
-        result = max(result, mid)
-        start = mid + 1
-    } else { // 쪼개지지 않는다면
-        end = mid - 1
-    }
-}
-
-print(result)
+binarySearch()
