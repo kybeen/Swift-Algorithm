@@ -1,29 +1,28 @@
 import Foundation
 
-let nm = readLine()!.split(separator: " ").map { Int($0)! }
-let N = nm[0]
-let M = nm[1]
-var nodes = [[Int]](repeating: [Int](), count: N+1)
+let NM = readLine()!.split(separator: " ").map { Int($0)! }
+let N = NM[0]
+let M = NM[1]
+var nodes = Array(repeating: [Int](), count: N+1)
 for _ in 0..<M {
-    let ab = readLine()!.split(separator: " ").map { Int($0)! }
-    let a = ab[0]
-    let b = ab[1]
-    nodes[a].append(b)
-    nodes[b].append(a)
+    let uv = readLine()!.split(separator: " ").map { Int($0)! }
+    let u = uv[0]
+    let v = uv[1]
+    nodes[u].append(v)
+    nodes[v].append(u)
 }
+var visited = [Bool](repeating: false, count: N+1)
 
 func dfs(_ now: Int) {
     visited[now] = true
     
-    for n in nodes[now] {
-        if !visited[n] {
-            dfs(n)
+    for node in nodes[now] {
+        if !visited[node] {
+            dfs(node)
         }
     }
 }
 
-var visited = [Bool](repeating: false, count: N+1)
-visited[0] = true
 var result = 0
 for i in 1...N {
     if !visited[i] {
