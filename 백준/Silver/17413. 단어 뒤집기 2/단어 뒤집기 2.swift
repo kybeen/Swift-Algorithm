@@ -1,35 +1,43 @@
 import Foundation
 
-let str = Array(readLine()!)
-var result = ""
-var isTag = false
-var temp: String = ""
-for s in str {
-    switch s {
-    case "<":
-        // 태그 이전까지의 temp의 문자열을 뒤집어서 result에 추가해준다.
-        result += temp.reversed()
-        temp = ""
-        isTag = true
-        result += "<"
-    case ">":
-        isTag = false
-        result += ">"
-    case " ":
-        if !isTag {
-            result += temp.reversed()
-            temp = ""
+extension String {
+    subscript(idx: Int) -> Self? {
+        guard (0..<count).contains(idx) else {
+            return nil
         }
-        result += " "
-    default:
-        if isTag {
-            result += String(s)
-        } else { // 태그가 아니라면 temp에 따로 넣어준다
-            temp += String(s)
+        let target = index(startIndex, offsetBy: idx)
+        return String(self[target])
+    }
+}
+
+let S = readLine()!.map { String($0) }
+var result = ""
+var reversedWord = ""
+
+var isTag = false
+
+for str in S {
+    if isTag {
+        if str == ">" {
+            isTag = false
+        }
+        result += str
+    } else {
+        switch str {
+        case " ":
+            result += reversedWord.reversed()
+            result += str
+            reversedWord = ""
+        case "<":
+            isTag = true
+            result += reversedWord.reversed()
+            result += str
+            reversedWord = ""
+        default:
+            reversedWord += str
         }
     }
 }
-if temp.count != 0 {
-    result += temp.reversed()
-}
+
+result += reversedWord.reversed() // 마지막 단어 추가
 print(result)
