@@ -18,31 +18,26 @@ var result: (time: Int, height: Int) = (Int.max, maxHeight)
 
 // 가능한 높이에 대해 모두 확인
 /// 어차피 최대 높이는 총 블록 개수에 기반해서 가능한 높이로 설정되어 있기 때문에 인벤토리 개수까지 고려할 필요 없이, 높은 블록들 먼저 제거해주면 된다.
-for height in stride(from: maxHeight, through: 0, by: -1) {
+for height in 0...maxHeight {
     var time = 0
     
-    // 현재 맞추려는 높이보다 높은 자리의 블록 제거
     for i in 0..<N {
         for j in 0..<M {
             // 현재 맞추려는 높이보다 높다면 높은만큼 제거하고 인벤토리로 (2초)
             if land[i][j] > height {
                 let removeBlock = land[i][j] - height
                 time += 2*(removeBlock)
-            }
-        }
-    }
-    // 현재 맞추려는 높이보다 낮은 자리에 블록 추가
-    for i in 0..<N {
-        for j in 0..<M {
-            // 현재 맞추려는 높이보다 낮다면 낮은만큼 블록 추가
-            if land[i][j] < height {
-                let addBlock = height - land[i][j]
-                time += (addBlock)
+            } else if land[i][j] < height {
+                // 현재 맞추려는 높이보다 낮다면 낮은만큼 블록 추가
+                if land[i][j] < height {
+                    let addBlock = height - land[i][j]
+                    time += (addBlock)
+                }
             }
         }
     }
     
-    if time < result.time {
+    if time <= result.time {
         result = (time, height)
     }
 }
