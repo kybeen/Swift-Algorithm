@@ -1,77 +1,73 @@
 import Foundation
 
-let n = Int(readLine()!)!
+let N = Int(readLine()!)!
 var board = [[Character]]()
-for _ in 0..<n {
+for _ in 0..<N {
     let row = Array(readLine()!)
     board.append(row)
 }
 
-// 가로 행의 최대 개수 체크
-func checkMaxRowCount(arr: [[Character]], n: Int) -> Int {
-    var result = 0
-    var beforeChr: Character = arr[0][0]
-    for i in 0..<n {
-        var temp = 1
-        beforeChr = arr[i][0]
-        for j in 1..<n {
-            if arr[i][j] == beforeChr {
-                temp += 1
-            } else {
-                temp = 1
-            }
-            beforeChr = arr[i][j]
-            result = max(result, temp)
-        }
-    }
-    return result
+typealias Point = (i: Int, j: Int)
+
+func swap(a: Point, b: Point) -> [[Character]] {
+    var newBoard = board
+    let valA = board[a.i][a.j]
+    let valB = board[b.i][b.j]
+    newBoard[a.i][a.j] = valB
+    newBoard[b.i][b.j] = valA
+    return newBoard
 }
 
-// 세로 열의 최대 개수 체크
-func checkMaxColCount(arr: [[Character]], n: Int) -> Int {
-    var result = 0
-    var beforeChr: Character = arr[0][0]
-    for j in 0..<n {
+func checkMaxCandyLine(_ board: [[Character]]) -> Int {
+    var maxCnt = 0
+    // 가장 긴 연속 부분 행 검사
+    for i in 0..<N {
         var temp = 1
-        beforeChr = arr[0][j]
-        for i in 1..<n {
-            if arr[i][j] == beforeChr {
+        var before = board[i][0]
+        for j in 1..<N {
+            if board[i][j] == before {
                 temp += 1
             } else {
                 temp = 1
+                before = board[i][j]
             }
-            beforeChr = arr[i][j]
-            result = max(result, temp)
+            maxCnt = max(maxCnt, temp)
         }
     }
-    return result
+    // 가장 긴 연속 부분 열 검사
+    for j in 0..<N {
+        var temp = 1
+        var before = board[0][j]
+        for i in 1..<N {
+            if board[i][j] == before {
+                temp += 1
+            } else {
+                temp = 1
+                before = board[i][j]
+            }
+            maxCnt = max(maxCnt, temp)
+        }
+    }
+    
+    return maxCnt
 }
 
 var result = 0
-for i in 0..<n {
-    for j in 0..<n {
-        if j < n-1 {
-            // 색이 다른 인접한 오른쪽이랑 교체
-            var temp = board
-            if temp[i][j] != temp[i][j+1] {
-                temp[i].swapAt(j, j+1)
-                // 가로/세로 최대 개수 체크
-                result = max(result, checkMaxRowCount(arr: temp, n: n))
-                result = max(result, checkMaxColCount(arr: temp, n: n))
+
+for i in 0..<N {
+    for j in 0..<N {
+        // 색이 다른 인접한 오른쪽과 교체
+        if j < N-1 {
+            if board[i][j] != board[i][j+1] {
+                let swappedBoard = swap(a: (i, j), b: (i, j+1))
+                result = max(result, checkMaxCandyLine(swappedBoard))
             }
         }
-        
-        if i < n-1 {
-            // 색이 다른 인접한 아래랑 교체
-            var temp = board
-            if temp[i][j] != temp[i+1][j] {
-                let a = temp[i][j]
-                let b = temp[i+1][j]
-                temp[i][j] = b
-                temp[i+1][j] = a
-                // 가로/세로 최대 개수 체크
-                result = max(result, checkMaxRowCount(arr: temp, n: n))
-                result = max(result, checkMaxColCount(arr: temp, n: n))
+        // 색이 다른 인접한 아래와 교체
+        if i < N-1 {
+            if board[i][j] != board[i+1][j] {
+                let swappedBoard = swap(a: (i, j), b: (i+1, j))
+                result = max(result, checkMaxCandyLine(swappedBoard))
             }
         }
     }
