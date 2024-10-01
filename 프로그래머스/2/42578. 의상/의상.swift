@@ -1,22 +1,28 @@
+/**
+- 종류 별로 1개까지만
+- 최소 1개 옷은 입음
+*/
+
 import Foundation
 
 func solution(_ clothes:[[String]]) -> Int {
-    var dict = [String: [String]]()
-    for cloth in clothes {
-        if dict[cloth[1]] != nil {
-            dict[cloth[1]]!.append(cloth[0])
+    typealias ClothesType = String
+    typealias ClothesName = String
+    var clothesDict: [ClothesType: [ClothesName]] = [:]
+    var result: Int = 1
+    
+    for clothesInfo in clothes {
+        let name = clothesInfo[0]
+        let type = clothesInfo[1]
+        if clothesDict[type] != nil {
+            clothesDict[type]!.append(name)
         } else {
-            dict[cloth[1]] = [cloth[0]]
+            clothesDict[type] = [name]
         }
     }
-    
-    var result = 1
-    var categories = dict.keys
-    // 각 의상 종류 별 옷의 개수들을 입지 않는 경우까지(+1) 고려해서 곱해주면 모든 경우의 수가 나옴
-    for category in categories {
-        result *= (dict[category]!.count + 1)
+    clothesDict.values.forEach {
+        result *= ($0.count + 1)
     }
     
-    // 옷을 하나도 입지 않는 경우를 하나 빼주면 정답
-    return result - 1
+    return result > 0 ? result - 1 : result
 }
