@@ -22,7 +22,8 @@ func solution(_ genres:[String], _ plays:[Int]) -> [Int] {
         }
     }
     
-    let bestAlbum = musicDict.sorted {
+    let bestAlbum = musicDict
+    .sorted {
         $0.value.reduce(0) { $0 + $1.playedCount } >
         $1.value.reduce(0) { $0 + $1.playedCount }
     }.map {
