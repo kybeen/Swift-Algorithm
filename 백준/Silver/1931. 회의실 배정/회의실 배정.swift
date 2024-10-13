@@ -1,25 +1,29 @@
 import Foundation
 
-let N = Int(readLine()!)!
-var meetings = [(start:Int, end:Int)]()
-for _ in 0..<N {
-    let meeting = readLine()!.split(separator: " ").map { Int($0)! }
-    meetings.append((meeting[0], meeting[1]))
+struct Meeting {
+    let start: Int
+    let end: Int
 }
-meetings.sort {
+
+let N = Int(readLine()!)!
+var meetings: [Meeting] = []
+for _ in 0..<N {
+    let timeInput = readLine()!.split(separator: " ").map({ Int($0)! })
+    meetings.append(Meeting(start: timeInput[0], end: timeInput[1]))
+}
+
+let sortedMeetings = meetings.sorted {
     if $0.end == $1.end {
         return $0.start < $1.start
     } else {
         return $0.end < $1.end
     }
 }
-
-var result = 0
-var endedTime = 0
-for meeting in meetings {
-    if meeting.start >= endedTime {
-        result += 1
-        endedTime = meeting.end
+var bestSchedule: [Meeting] = [sortedMeetings.first!]
+for i in 1..<N {
+    let prev = bestSchedule.last!
+    if sortedMeetings[i].start >= prev.end {
+        bestSchedule.append(sortedMeetings[i])
     }
 }
-print(result)
+print(bestSchedule.count)
