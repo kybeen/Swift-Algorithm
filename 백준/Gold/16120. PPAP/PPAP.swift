@@ -8,7 +8,7 @@ ppap.forEach { chr in
     checkPPAP()
 }
 
-if ppapStack.isEmpty || (ppapStack.count == 1 && ppapStack.first! == "P") {
+if ppapStack.count == 1 && ppapStack.first! == "P" {
     print("PPAP")
 } else {
     print("NP")
