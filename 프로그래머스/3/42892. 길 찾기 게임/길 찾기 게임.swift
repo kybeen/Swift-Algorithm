@@ -4,7 +4,6 @@ class Node {
     let num: Int
     let x: Int
     let y: Int
-    var parent: Node?
     var left: Node?
     var right: Node?
     
@@ -16,7 +15,6 @@ class Node {
         self.num = num
         self.x = x
         self.y = y
-        self.parent = nil
         self.left = nil
         self.right = nil
     }
@@ -27,14 +25,12 @@ class Node {
                 left?.addChild(node)
             } else {
                 left = node
-                left?.parent = self
             }
         } else { // 오른쪽 자식
             if right != nil {
                 right?.addChild(node)
             } else {
                 right = node
-                right?.parent = self
             }
         }
     }
