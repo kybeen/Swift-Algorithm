@@ -34,3 +34,48 @@ func solution(_ n:Int, _ computers:[[Int]]) -> Int {
     
     return result
 }
+
+
+
+// import Foundation
+
+// func solution(_ n:Int, _ computers:[[Int]]) -> Int {
+//     var visited: [Bool] = Array(repeating: false, count: n)
+//     var result = 0
+    
+//     func dfs(_ now: Int) {
+//         visited[now] = true
+        
+//         for i in 0..<n {
+//             if (computers[now][i] == 1) && !visited[i] {
+//                 dfs(i)
+//             }
+//         }
+//     }
+    
+//     for i in 0..<n {
+//         if !visited[i] {
+//             result += 1
+//             dfs(i)
+//         }
+//     }
+    
+//     return result
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
