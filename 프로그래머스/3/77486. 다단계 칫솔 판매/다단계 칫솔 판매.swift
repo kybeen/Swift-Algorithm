@@ -1,36 +1,30 @@
 import Foundation
 
 func solution(_ enroll:[String], _ referral:[String], _ seller:[String], _ amount:[Int]) -> [Int] {
-    var parents = [String: String]()
-    var profits = [String: Int]()
+    var profit = [String: Int]()
+    var inviter = [String: String]()
     
     for i in 0..<enroll.count {
-        parents[enroll[i]] = referral[i]
-        profits[enroll[i]] = 0
+        inviter[enroll[i]] = referral[i]
     }
-    
-    func calculateProfit(name: String, value: Int) {
-        guard name != "-" else { return }
-        let charge = value / 10
-        let profit = value - charge
-        profits[name]! += profit
-        
-        guard charge > 0 else { return }
-        let parent = parents[name]!
-        calculateProfit(name: parent, value: charge)
-    }
+    // for e in enroll {
+    //     print("\(e)를 추천한 사람 \(inviter[e]!)")
+    // }
     
     for i in 0..<seller.count {
-        let sellerName = seller[i]
-        let amountValue = amount[i] * 100
-        calculateProfit(name: sellerName, value: amountValue)
+        var nowSeller = seller[i]
+        var cost = amount[i] * 100
         
+        while nowSeller != "-", cost > 0 {
+            let charge = cost / 10 // 수수료
+            let realProfit = cost - Int(charge) // 순이익
+            if nowSeller != "-" {
+                profit[nowSeller, default: 0] += realProfit
+                cost = charge
+                nowSeller = inviter[nowSeller]!
+            }
+        }
     }
     
-    var result = [Int]()
-    for enr in enroll {
-        result.append(profits[enr]!)
-    }
-    
-    return result
+    return enroll.map { profit[$0, default: 0] }
 }
