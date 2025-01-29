@@ -1,6 +1,5 @@
 import Foundation
 
-/// 좌표
 struct Point: Hashable {
     let i: Int
     let j: Int
@@ -10,58 +9,45 @@ struct Point: Hashable {
         self.j = j
     }
 }
-/// 지나간 길 정보 타입
-/// - from: 출발점
-/// - to: 도착점
+
 struct Path: Hashable {
     let from: Point
     let to: Point
     
-    func reversed() -> Self {
-        return Path(from: to, to: from)
+    init(_ from: Point, _ to: Point) {
+        self.from = from
+        self.to = to
     }
 }
 
 func solution(_ dirs:String) -> Int {
-    var now = Point(0, 0)
-    var result = Set<Path>()
+    var dirs = dirs.map { String($0) }
+    var offset: [String: Point] = [
+        "U": Point(-1,0),
+        "D": Point(1,0),
+        "L": Point(0,-1),
+        "R": Point(0,1)
+    ]
     
-    func addPath(_ movedPoint: Point) {
-        let path = Path(from: now, to: movedPoint)
-        // 방향이 반대인 path가 있는지 확인
-        if !result.contains(path.reversed()) {
-            result.insert(path)
-        }
-        now = movedPoint
+    var start = Point(0,0)
+    var visited = Set<Path>()
+    
+    func isVisitedPath(_ path: Path) -> Bool {
+        let reversed = Path(path.to, path.from)
+        return visited.contains(path) || visited.contains(reversed)
     }
     
     for dir in dirs {
-        var moved: Int
-        switch dir {
-        case "U":
-            moved = now.i + 1
-            guard (-5...5) ~= moved else { continue }
-            let movedPoint = Point(moved, now.j)
-            addPath(movedPoint)
-        case "D":
-            moved = now.i - 1
-            guard (-5...5) ~= moved else { continue }
-            let movedPoint = Point(moved, now.j)
-            addPath(movedPoint)
-        case "L":
-            moved = now.j - 1
-            guard (-5...5) ~= moved else { continue }
-            let movedPoint = Point(now.i, moved)
-            addPath(movedPoint)
-        case "R":
-            moved = now.j + 1
-            guard (-5...5) ~= moved else { continue }
-            let movedPoint = Point(now.i, moved)
-            addPath(movedPoint)
-        default:
-            break
+        let nextI = start.i + offset[dir]!.i
+        let nextJ = start.j + offset[dir]!.j
+        guard nextI >= -5 && nextJ >= -5 && nextI <= 5 && nextJ <= 5 else { continue }
+        let next = Point(nextI, nextJ)
+        let path = Path(start, next)
+        start = next
+        if !isVisitedPath(path) {
+            visited.insert(path)
         }
     }
     
-    return result.count
+    return visited.count
 }
