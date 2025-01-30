@@ -1,40 +1,47 @@
 import Foundation
 
 func solution(_ s:String) -> Int {
-    var brackets = s.map { String($0) }
-    var cycleCount = s.count
-    var result: Int = 0
+    let s = s.map { String($0) }
     
-    // 회전 (시작 인덱스 이동)
-    while cycleCount > 0 {
+    func isValidBracket(_ start: Int, _ str: [String]) -> Bool {
         var stk = [String]()
+        let length = str.count
+        var idx = start % length
         
-        // 올바른 괄호 문자열 확인
-        for idx in 0..<brackets.count {
-            let now = brackets[idx]
-            if !stk.isEmpty {
-                let last = stk.last!
-                switch last {
-                case "(" where now == ")":
-                    _ = stk.popLast()!
-                case "{" where now == "}":
-                    _ = stk.popLast()!
-                case "[" where now == "]":
-                    _ = stk.popLast()!
-                default:
-                    stk.append(now)
+        for _ in 0..<length {
+            idx = (idx % length)
+            
+            let bracket = str[idx]
+            if ["(", "[", "{"].contains(bracket) {
+                stk.append(bracket)
+            } else if [")", "]", "}"].contains(bracket) {
+                if stk.isEmpty {
+                    return false
+                } else if let last = stk.last {
+                    switch last {
+                        case "(" where bracket == ")":
+                            _ = stk.popLast()
+                        case "[" where bracket == "]":
+                            _ = stk.popLast()
+                        case "{" where bracket == "}":
+                            _ = stk.popLast()
+                        default:
+                            return false
+                    }
                 }
-            } else {
-                stk.append(now)
             }
+            
+            idx += 1
         }
-        if stk.isEmpty {
+        
+        return stk.isEmpty ? true : false
+    }
+    
+    var result = 0
+    for x in 0..<s.count {
+        if isValidBracket(x, s) {
             result += 1
         }
-        stk = []
-        cycleCount -= 1
-        let first = brackets.removeFirst()
-        brackets.append(first)
     }
     
     return result
