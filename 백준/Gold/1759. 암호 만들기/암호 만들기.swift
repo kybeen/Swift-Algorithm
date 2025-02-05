@@ -1,35 +1,28 @@
-import Foundation
+let LC = readLine()!.split(separator: " ").map { Int($0)! }
+let (L, C) = (LC[0], LC[1]) // L:암호 길이 / C:문자 종류
+var alphabets = readLine()!.split(separator: " ").map { String($0) }.sorted()
 
-let nums = readLine()!.split(separator: " ").map { Int($0)! }
-let L = nums[0]
-let C = nums[1]
-var arr = readLine()!.split(separator: " ").map { String($0) }
-arr.sort()
-
-var stack = [String]()
-var result = ""
-
-func dfs(_ depth: Int, _ lastIndex: Int) {
-    if depth == L {
-        let moCount = stack.filter { ["a", "i", "o", "u", "e"].contains($0) }.count // 모음 개수
-        let jaCount = L - moCount // 자음 개수
-        if moCount >= 1 && jaCount >= 2 {
-            result += stack.joined(separator: "") + "\n"
+var password = [String]()
+var result = [String]()
+func dfs(_ now: Int, _ jaeum: Int, _ moeum: Int) {
+    if password.count == L {
+        if moeum >= 1 && jaeum >= 2 {
+            result.append(password.joined())
         }
         return
     }
     
-    for i in lastIndex+1..<C {
-        stack.append(arr[i])
-        dfs(depth+1, i)
-        _ = stack.popLast()
+    for i in now..<alphabets.count {
+        let alphabet = alphabets[i]
+        password.append(alphabet)
+        if ["a", "i", "o", "u", "e"].contains(alphabet) {
+            dfs(i+1, jaeum, moeum+1)
+        } else {
+            dfs(i+1, jaeum+1, moeum)
+        }
+        _ = password.popLast()
     }
 }
 
-for i in 0..<C {
-    stack.append(arr[i])
-    dfs(1, i)
-    _ = stack.popLast()
-}
-
-print(result)
+dfs(0, 0, 0)
+result.forEach { print($0) }
