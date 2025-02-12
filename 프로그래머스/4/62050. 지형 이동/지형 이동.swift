@@ -1,48 +1,35 @@
 import Foundation
 
-struct Point {
-    let i: Int
-    let j: Int
-    
-    init(_ i: Int, _ j: Int) {
-        self.i = i
-        self.j = j
-    }
-    
-    func isValid(in length: Int) -> Bool {
-        guard i >= 0 && j >= 0 && i < length && j < length else {
-            return false
-        }
-        return true
-    }
-}
-
 func solution(_ land:[[Int]], _ height:Int) -> Int {
+    typealias Point = (i: Int, j: Int)
     let N = land.count
-    let di = [-1, 1, 0, 0]
-    let dj = [0, 0, -1, 1]
     
-    var group = Array(repeating: Array(repeating: -1, count: N), count: N)
-    var groupNum = 0
+    // MARK: - 그룹 나누기
     
-    /// 그룹을 만들기 위한 BFS 함수
-    func bfs(_ start: Point) {
+    var group = Array(repeating: Array(repeating: -1, count: N), count: N) // group[i][j]: i,j좌표의 그룹 번호
+    /// start 좌표부터 시작해서 groupNum 번호 그룹을 구하는 함수
+    func makeGroup(_ start: Point, _ groupNum: Int) {
         var idx = 0
-        var queue: [Point] = [start]
+        var queue = [Point]()
+        queue.append(start)
+        group[start.i][start.j] = groupNum
+        
+        let di = [-1, 1, 0, 0]
+        let dj = [0, 0, -1, 1]
         
         while idx < queue.count {
             let now = queue[idx]
-            group[now.i][now.j] = groupNum
+            let nowHeight = land[now.i][now.j]
             
             for k in 0..<4 {
-                let next = Point(now.i+di[k], now.j+dj[k])
-                guard next.isValid(in: N) else { continue }
-                let nowHeight = land[now.i][now.j]
-                let nextHeight = land[next.i][next.j]
-                let cost = abs(nowHeight - nextHeight)
-                if (cost <= height) && (group[next.i][next.j] != groupNum) {
-                    group[next.i][next.j] = groupNum
-                    queue.append(next)
+                let nextI = now.i + di[k]
+                let nextJ = now.j + dj[k]
+                guard nextI >= 0 && nextJ >= 0 && nextI < N && nextJ < N else { continue }
+                let possibleToMove = abs(land[nextI][nextJ] - nowHeight) <= height
+                // 아직 그룹이 안정해져있고, 이동 가능한 높이차라면 그룹에 등록
+                if group[nextI][nextJ] == -1 && possibleToMove {
+                    queue.append((nextI, nextJ))
+                    group[nextI][nextJ] = groupNum
                 }
             }
             
@@ -50,85 +37,96 @@ func solution(_ land:[[Int]], _ height:Int) -> Int {
         }
     }
     
-    /// 사다리 설치 없이 이동 가능한 그룹 나누기
+    var groupNum = 0
     for i in 0..<N {
         for j in 0..<N {
             if group[i][j] == -1 {
                 groupNum += 1
-                let startPoint = Point(i,j)
-                bfs(startPoint)
+                makeGroup((i, j), groupNum)
             }
         }
     }
     
-    // for g in group {
-    //     print(g)
-    // }
+    // MARK: - 그룹 간 사다리 간선 구하기
     
-    /// 그룹 간 간선(사다리) 비용 구하기
-    var edges = [(a: Int, b: Int, cost: Int)]() // (그룹A, 그룹B, 사다리비용)
-    for i in 0..<N {
-        for j in 0..<N {
-            let now = Point(i,j)
-            for k in 0..<4 {
-                let next = Point(now.i+di[k], now.j+dj[k])
-                guard next.isValid(in: N) else { continue }
-                // 다른 그룹인 경우의 사다리 간선 추가
-                let nowGroup = group[now.i][now.j]
-                let nextGroup = group[next.i][next.j]
-                if nowGroup != nextGroup {
-                    let cost = abs(land[now.i][now.j] - land[next.i][next.j])
-                    let a = min(nowGroup, nextGroup)
-                    let b = max(nowGroup, nextGroup)
-                    edges.append((a, b, cost))
+    struct Ladder: Hashable {
+        let a: Int // 그룹A
+        let b: Int // 그룹B
+        let cost: Int // 그룹A~그룹B에 설치 가능한 사다리 비용
+        
+        init(_ a: Int, _ b: Int, _ cost: Int) {
+            self.a = a
+            self.b = b
+            self.cost = cost
+        }
+    }
+    var edges = Set<Ladder>()
+    
+    /// 그룹 간에 가능한 모든 사다리 설치 비용을 구하는 함수
+    func getAllPossibleLadders() {
+        for i in 0..<N {
+            for j in 0..<N {
+                // 탐색 방향이 있기 때문에 아래/오른쪽만 확인하면 됨
+                let di = [1, 0]
+                let dj = [0, 1]
+                for k in 0..<2 {
+                    let nextI = i + di[k]
+                    let nextJ = j + dj[k]
+                    guard nextI >= 0 && nextJ >= 0 && nextI < N && nextJ < N else { continue }
+                    let groupA = group[i][j]
+                    let groupB = group[nextI][nextJ]
+                    if groupA != groupB {
+                        let ladderCost = abs(land[i][j] - land[nextI][nextJ])
+                        // a,b그룹만 바꾼 동일한 간선이 이미 있는지 확인 후 추가
+                        if !edges.contains(Ladder(groupB, groupA, ladderCost)) {
+                            edges.insert(Ladder(groupA, groupB, ladderCost))
+                        }
+                    }
                 }
             }
         }
     }
     
-    // for edge in edges {
-    //     print(edge)
-    // }
+    getAllPossibleLadders()
     
-    /// 그룹 노드들의 최소 신장 트리 구하기
-    var result: Int = 0
-    var parents: [Int] = Array(0...groupNum)
+    // MARK: - 최소 신장 트리 구하기
+    
+    var parent = Array(0...groupNum)
     var rank = Array(repeating: 0, count: groupNum+1)
-    edges.sort { $0.cost < $1.cost }
     
-    /// Union-Find의 루트 합치기
+    /// Union-Find 함수
     func union(_ a: Int, _ b: Int) {
         let rootA = find(a)
         let rootB = find(b)
-        
         if rank[rootA] > rank[rootB] {
-            parents[rootB] = rootA
+            parent[rootB] = rootA
         } else if rank[rootA] < rank[rootB] {
-            parents[rootA] = rootB
+            parent[rootA] = rootB
         } else {
-            parents[rootB] = rootA
+            parent[rootB] = rootA
             rank[rootA] += 1
         }
     }
     
-    /// Union-Find의 루트 노드 찾기
     func find(_ node: Int) -> Int {
-        if parents[node] == node {
+        if parent[node] == node {
             return node
         } else {
-            parents[node] = find(parents[node]) // 경로 압축
-            return parents[node]
+            parent[node] = find(parent[node])
+            return parent[node]
         }
     }
     
-    for edge in edges {
-        // 서로 다른 집합이면 합치기
+    let sortedEdges = edges.sorted { $0.cost < $1.cost }
+    var result = 0
+    
+    for edge in sortedEdges {
         let rootA = find(edge.a)
         let rootB = find(edge.b)
+        // 사이클이 아니라면 사다리 연결
         if rootA != rootB {
-            union(edge.a, edge.b)
-            // 최소 신장 트리 간선의 비용들을 더해준다.
             result += edge.cost
+            union(edge.a, edge.b)
         }
     }
     
