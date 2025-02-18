@@ -2,21 +2,32 @@ import Foundation
 
 func solution(_ n:Int, _ stations:[Int], _ w:Int) -> Int {
     let stationCount = stations.count
+    var stationIdx = 0
     var now = 1
-    var idx = 0
-    var result = 0
+    var answer = 0
     
+    // 새로운 기지국 설치하고 이동
+    func addNewTower() {
+        now += (2*w + 1)
+        answer += 1
+    }
+    
+    // now 위치에 이미 기지국이 설치된 곳의 전파가 도달하는지 확인
+    // 그렇지 않다면 새 기지국 설치
     while now <= n {
-        // 현재 위치가 이미 설치된 기지국의 전파가 도달하고 있는 곳이라면 해당 범위는 건너뜀
-        if idx < stationCount && (now >= stations[idx] - w) {
-            now = (stations[idx] + w + 1)
-            idx += 1
+        guard stationIdx < stationCount else {
+            addNewTower()
+            continue
+        }
+        
+        let leftBorder = stations[stationIdx] - w
+        if now >= leftBorder {
+            now = stations[stationIdx] + w + 1
+            stationIdx += 1
         } else {
-            // 기지국 설치
-            now += (w*2+1)
-            result += 1
+            addNewTower()
         }
     }
 
-    return result
+    return answer
 }
