@@ -1,20 +1,25 @@
 def solution(money):
     n = len(money)
-    # dpFirst : 첫번째 집을 터는 경우의 DP 테이블
-    # dpLast : 마지막 집을 터는 경우의 DP 테이블
-    dpFirst = [0] * n
-    dpLast = [0] * n
+    if n == 1:
+        return money[0]
     
-    # 첫번째 집 터는 경우
-    dpFirst[0] = money[0]
-    dpFirst[1] = dpFirst[0]
-    for i in range(2, n-1):
-        dpFirst[i] = max(dpFirst[i-1], dpFirst[i-2] + money[i])
+    # 첫 번째 집을 터는 경우
+    dp_first = [0] * n
+    dp_first[0] = money[0]
+    dp_first[1] = money[0]
     
-    # 마지막 집 터는 경우
-    dpLast[0] = 0
-    dpLast[1] = money[1]
-    for i in range(2, n):
-        dpLast[i] = max(dpLast[i-1], dpLast[i-2] + money[i])
+    for i in range(2, n - 1):  # 마지막 집은 고려 X
+        dp_first[i] = max(dp_first[i - 1], dp_first[i - 2] + money[i])
     
-    return max(max(dpFirst), max(dpLast))
+    answer = dp_first[n - 2]
+    
+    # 첫 번째 집을 털지 않는 경우
+    dp_no_first = [0] * n
+    dp_no_first[1] = money[1]
+    
+    for i in range(2, n):  # 마지막 집까지 고려
+        dp_no_first[i] = max(dp_no_first[i - 1], dp_no_first[i - 2] + money[i])
+    
+    answer = max(answer, dp_no_first[n - 1])
+    
+    return answer
