@@ -20,27 +20,24 @@ queue.append((1, 0))
 visited[1] = true
 
 while idx < queue.count {
-    let now = queue[idx]
-    visited[now.point] = true
+    let (now, diceCount) = queue[idx]
     
-    if now.point == 100 { // 도착 시 정답 갱신
-        answer = min(answer, now.diceCount)
+    if now == 100 { // 도착 시 정답 갱신
+        answer = min(answer, diceCount)
         break
     }
     
     for dice in (1...6) {
-        let next = now.point + dice
+        let next = now + dice
         guard next <= 100, !visited[next] else { continue }
+        visited[next] = true
         
         let ladderSnakePoint = movePoint[next, default: 0]
         if ladderSnakePoint != 0 {
-            if !visited[ladderSnakePoint] {
-                queue.append((ladderSnakePoint, now.diceCount+1)) // 주사위 이동 후 사다리나 뱀 타기
-            }
+            visited[ladderSnakePoint] = true
+            queue.append((ladderSnakePoint, diceCount+1)) // 주사위 이동 후 사다리나 뱀 타기
         } else {
-            if !visited[next] {
-                queue.append((next, now.diceCount+1)) // 주사위 만큼만 이동
-            }
+            queue.append((next, diceCount+1)) // 주사위 만큼만 이동
         }
     }
     
