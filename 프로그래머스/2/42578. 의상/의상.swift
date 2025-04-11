@@ -1,28 +1,14 @@
-/**
-- 종류 별로 1개까지만
-- 최소 1개 옷은 입음
-*/
-
 import Foundation
 
 func solution(_ clothes:[[String]]) -> Int {
-    typealias ClothesType = String
-    typealias ClothesName = String
-    var clothesDict: [ClothesType: [ClothesName]] = [:]
-    var result: Int = 1
-    
-    for clothesInfo in clothes {
-        let name = clothesInfo[0]
-        let type = clothesInfo[1]
-        if clothesDict[type] != nil {
-            clothesDict[type]!.append(name)
-        } else {
-            clothesDict[type] = [name]
-        }
-    }
-    clothesDict.values.forEach {
-        result *= ($0.count + 1)
+    var dict = [String: [String]]()
+    for cloth in clothes {
+        let (name, type) = (cloth[0], cloth[1])
+        dict[type, default: []].append(name)
     }
     
-    return result > 0 ? result - 1 : result
+    // 각 종류 별 의상 개수를 곱하면 모든 조합 (착용하지 않는 경우 1개 추가)
+    var answer = dict.values.reduce(1) { $0 * ($1.count + 1) } - 1 // 아무것도 착용하지 않는 경우 하나 제거
+    
+    return answer
 }
