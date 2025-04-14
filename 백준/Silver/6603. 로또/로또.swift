@@ -1,26 +1,29 @@
 import Foundation
 
-while true {
-    let testCase = readLine()!.split(separator: " ").map{ Int($0)! }
-    let k = testCase[0]
-    if k == 0 { break }
+var answer = [String]()
+
+while let input = readLine()?.split(separator: " ").map({ Int($0)! }) {
+    if input[0] == 0 { break }
+    let nums = Array(input.dropFirst())
+//    print(k, nums)
+    var testCaseResult = ""
     
-    var stack = [Int]()
-    func dfs(_ depth: Int, _ now: Int) {
-        if depth == 6 {
-            print(stack.map{String($0)}.joined(separator: " "))
+    var stk = [Int]()
+    func dfs(_ now: Int) {
+        if stk.count == 6 {
+            testCaseResult += stk.map({ String($0) }).joined(separator: " ")
+            testCaseResult += "\n"
             return
         }
         
-        if now < k {
-            for i in now+1...k {
-                stack.append(testCase[i])
-                dfs(depth+1, i)
-                stack.popLast()
-            }
+        for i in now+1..<nums.count {
+            stk.append(nums[i])
+            dfs(i)
+            _ = stk.popLast()
         }
     }
-    
-    dfs(0, 0)
-    print()
+    dfs(-1)
+    answer.append(testCaseResult)
 }
+
+print(answer.joined(separator: "\n"))
