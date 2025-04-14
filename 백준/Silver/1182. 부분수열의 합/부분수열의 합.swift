@@ -1,15 +1,14 @@
 import Foundation
 
-let NS = readLine()!.split(separator: " ").map { Int($0)! }
-let N = NS[0]
-let S = NS[1]
-var nums = readLine()!.split(separator: " ").map { Int($0)! }
+let NS = readLine()!.split(separator: " ").map({ Int($0)! })
+let (N, S) = (NS[0], NS[1])
+let nums = readLine()!.split(separator: " ").map({ Int($0)! })
 
-var result = 0
+var answer = 0
 
 func dfs(_ now: Int, _ sum: Int) {
     if sum == S {
-        result += 1
+        answer += 1
     }
     
     for i in now+1..<N {
@@ -20,4 +19,4 @@ func dfs(_ now: Int, _ sum: Int) {
 for i in 0..<N {
     dfs(i, nums[i])
 }
-print(result)
+print(answer)
