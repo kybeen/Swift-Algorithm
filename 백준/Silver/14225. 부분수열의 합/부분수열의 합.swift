@@ -1,24 +1,26 @@
 import Foundation
 
 let N = Int(readLine()!)!
-let S = readLine()!.split(separator: " ").map { Int($0)! }
-
-// 해당 인덱스의 수를 만들 수 있는지 여부 (문제 조건에 따라 나올 수 있는 최대 합은 2,000,000임)
-var possibles = [Bool](repeating: false, count: 2_000_001)
+let S = readLine()!.split(separator: " ").map({ Int($0)! })
+let maxNumber = S.reduce(0, +) // 가능한 가장 큰 수
+var possible = Array(repeating: false, count: maxNumber+2) // 해당 숫자를 만들 수 있는지 여부 (모두 가능한 경우 대비해서 1 더 큰 수까지)
+possible[0] = true
 
 func dfs(_ now: Int, _ sum: Int) {
-    possibles[sum] = true
+    possible[sum] = true
     
     for i in now+1..<N {
-        dfs(i, sum+S[i])
+        dfs(i, sum + S[i])
     }
 }
 
-dfs(-1, 0)
+for i in 0..<N {
+    dfs(i, S[i])
+}
 
-for i in 1..<2_000_001 {
-    if !possibles[i] {
-        print(i)
+for (num, isPossible) in possible.enumerated() {
+    if !isPossible {
+        print(num)
         break
     }
 }
