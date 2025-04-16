@@ -1,48 +1,54 @@
 import Foundation
 
 let k = Int(readLine()!)!
-var A = readLine()!.split(separator: " ").map { String($0) }
+let inequality = readLine()!.split(separator: " ")
 
-var arr = [Int]()
-var result = [String]() // 부등호 관계를 만족시키는 정수들을 저장할 배열 (맨 앞자리가 0일수도 있기 때문에 문자열로 저장)
+var answer = (minValue: Int.max, maxValue: Int.min, minStr: "", maxStr: "")
+var stk = [Int]()
 
-func dfs(_ idx: Int) {
-    // 결과 수열의 마지막 인덱스가 부등호 개수와 같으면 (결과 수열의 길이가 부등호 개수보다 1개 많아지면) 결과 배열에 저장
-    if idx == k {
-        result.append(arr.reduce(""){ $0 + String($1) })
+func dfs() {
+    if stk.count == k+1 {
+        let result = stk.map({ String($0) }).joined(separator: "")
+        if answer.minValue > Int(result)! {
+            answer.minValue = Int(result)!
+            answer.minStr = result
+        }
+        if answer.maxValue < Int(result)! {
+            answer.maxValue = Int(result)!
+            answer.maxStr = result
+        }
         return
     }
     
-    for i in 0...9 {
-        // 0~9 중 확인 안 된 수가 부등호 조건에 부합하면 DFS 진행
-        if !arr.contains(i) {
-            switch A[idx] {
-            case "<":
-                if arr.last! < i {
-                    arr.append(i)
-                    dfs(idx+1)
-                    _ = arr.popLast()
+    for num in 0...9 {
+        if !stk.contains(num) {
+            if stk.isEmpty {
+                stk.append(num)
+                dfs()
+                _ = stk.popLast()
+            } else {
+                let lastIdx = stk.count-1
+                switch inequality[lastIdx] {
+                case "<":
+                    if stk[lastIdx] < num {
+                        stk.append(num)
+                        dfs()
+                        _ = stk.popLast()
+                    }
+                case ">":
+                    if stk[lastIdx] > num {
+                        stk.append(num)
+                        dfs()
+                        _ = stk.popLast()
+                    }
+                default: break
                 }
-            case ">":
-                if arr.last! > i {
-                    arr.append(i)
-                    dfs(idx+1)
-                    _ = arr.popLast()
-                }
-            default:
-                continue
             }
         }
     }
 }
 
-for i in 0...9 {
-    arr.append(i)
-    dfs(0)
-    _ = arr.popLast()
-}
+dfs()
 
-// 결과 정렬 후 첫번째와 마지막 값 출력
-result.sort()
-print(result.last!)
-print(result.first!)
+print(answer.maxStr)
+print(answer.minStr)
