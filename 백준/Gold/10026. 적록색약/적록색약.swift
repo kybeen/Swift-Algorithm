@@ -1,48 +1,52 @@
 import Foundation
 
 let N = Int(readLine()!)!
-var board = [[Character]]()
+var grid = [[String]]()
 for _ in 0..<N {
-    board.append(Array(readLine()!))
+    grid.append(readLine()!.map({ String($0) }))
 }
+//grid.forEach { print($0) }
 
-var visited = Array(repeating: Array(repeating: false, count: N), count: N)
-
-func bfs(_ start: (i:Int, j:Int), color: Character, noRGB: Bool = false) {
+struct Point {
+    let i: Int
+    let j: Int
+    
+    init(_ i: Int, _ j: Int) {
+        self.i = i
+        self.j = j
+    }
+}
+func bfs(_ start: Point, _ color: String, isNormal: Bool = true) {
     var idx = 0
-    var queue = [(i:Int, j:Int)]()
+    var queue = [Point]()
+    queue.append(start)
     
     let di = [-1, 1, 0, 0]
     let dj = [0, 0, -1, 1]
     
-    queue.append((start.i, start.j))
-    while idx < queue.count  {
+    while idx < queue.count {
         let now = queue[idx]
         
         for k in 0..<4 {
-            let new_i = now.i + di[k]
-            let new_j = now.j + dj[k]
-            
-            if new_i < 0 || new_j < 0 || new_i >= N || new_j >= N {
-                continue
-            }
-            
-            if noRGB { // 적록색약일 경우
-                if color == "B" { // 파란색은 그냥 확인
-                    if !visited[new_i][new_j] && board[new_i][new_j] == color {
-                        visited[new_i][new_j] = true
-                        queue.append((new_i, new_j))
-                    }
-                } else { // 빨간색과 초록색은 구분하지 x
-                    if !visited[new_i][new_j] && (board[new_i][new_j] == "R" || board[new_i][new_j] == "G") {
-                        visited[new_i][new_j] = true
-                        queue.append((new_i, new_j))
-                    }
+            let nextI = now.i + di[k]
+            let nextJ = now.j + dj[k]
+            guard nextI >= 0 && nextJ >= 0 && nextI < N && nextJ < N else { continue }
+            if isNormal { // 일반
+                if grid[nextI][nextJ] == color && !visited[nextI][nextJ] {
+                    visited[nextI][nextJ] = true
+                    queue.append(Point(nextI, nextJ))
                 }
-            } else { // 적록색약이 아닐 경우
-                if !visited[new_i][new_j] && board[new_i][new_j] == color {
-                    visited[new_i][new_j] = true
-                    queue.append((new_i, new_j))
+            } else { // 적록색약
+                if color == "B" {
+                    if grid[nextI][nextJ] == color && !visited[nextI][nextJ] {
+                        visited[nextI][nextJ] = true
+                        queue.append(Point(nextI, nextJ))
+                    }
+                } else {
+                    if ["R", "G"].contains(grid[nextI][nextJ]) && !visited[nextI][nextJ] {
+                        visited[nextI][nextJ] = true
+                        queue.append(Point(nextI, nextJ))
+                    }
                 }
             }
         }
@@ -51,27 +55,34 @@ func bfs(_ start: (i:Int, j:Int), color: Character, noRGB: Bool = false) {
     }
 }
 
-var result = [0, 0]
-// 적록색약 아닌 사람
+// 일반 사람
+var rgb = [String: Int]() // 색샹별 구역 개수
+var visited = Array(repeating: Array(repeating: false, count: N), count: N)
 for i in 0..<N {
     for j in 0..<N {
         if !visited[i][j] {
-            result[0] += 1
-            visited[i][j] = true
-            bfs((i,j), color: board[i][j])
+            let start = Point(i, j)
+            let color = grid[i][j]
+            rgb[color, default: 0] += 1
+            bfs(start, color)
         }
     }
 }
-visited = Array(repeating: Array(repeating: false, count: N), count: N)
-// 적록색약인 사람
-for i in 0..<N {
-    for j in 0..<N {
-        if !visited[i][j] {
-            result[1] += 1
-            visited[i][j] = true
-            bfs((i,j), color: board[i][j], noRGB: true)
-        }
-    }
-}
+let normalAnswer = rgb.values.reduce(0, +)
 
-print("\(result[0]) \(result[1])")
+// 적록색약
+rgb = [String: Int]()
+visited = Array(repeating: Array(repeating: false, count: N), count: N)
+for i in 0..<N {
+    for j in 0..<N {
+        if !visited[i][j] {
+            let start = Point(i, j)
+            let color = grid[i][j]
+            rgb[color, default: 0] += 1
+            bfs(start, color, isNormal: false)
+        }
+    }
+}
+let blindAnswer = rgb.values.reduce(0, +)
+
+print(normalAnswer, blindAnswer)
